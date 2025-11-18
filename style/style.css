@@ -89,3 +89,69 @@
 .btn-edit:hover{
         background-color: rgb(255, 115, 0);
 }
+
+/* MODALE */
+.modal-bg {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,.5);
+justify-content: center;
+align-items: center;
+}
+
+
+.modal {
+background: white;
+width: 90%;
+max-width: 420px;
+padding: 20px;
+border-radius: 12px;
+animation: fadeIn .3s;
+}
+
+.info-photo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+@keyframes fadeIn {
+from {transform: scale(.8); opacity: 0;}
+to {transform: scale(1); opacity: 1;}
+}
+
+
+.modal input  {
+width: 100%;
+padding: 10px;
+margin: 8px 0;
+border-radius: 8px;
+border: 1px solid #aaa;
+}
+.modal select{
+    width: 100%;
+padding: 10px;
+margin: 8px 0;
+border-radius: 8px;
+border: 1px solid #aaa;
+}
+#photoURL #photoModal{
+     width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #ddd;
+}
+
+.btn-save {
+padding: 10px;
+width: 100%;
+background: green;
+border: none;
+border-radius: 8px;
+color: white;
+font-size: 16px;
+cursor: pointer;
+margin-top: 10px;
+}

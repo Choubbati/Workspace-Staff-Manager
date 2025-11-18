@@ -19,7 +19,7 @@
                 <header>Unassigned Staff</header>
                 <div class="line"></div>
                 <div class="staff-list">
-                    <button class="add-btn">Add New Worker</button>
+                    <button id="btn-add" class="add-btn">Add New Worker</button>
                     <div class="profil-card">
                         <div class="img-profil"></div>
                         <div class="role">
@@ -84,17 +84,37 @@
     <!-- MODALE -->
     <div class="modal-bg" id="modal">
         <div class="modal">
-            <h3>New Employee</h3>
-            <input type="text" placeholder="Nom complet">
-            <input type="text" placeholder="Rôle">
-            <input type="text" placeholder="Photo (URL)">
-            <input type="email" placeholder="Email">
-            <input type="text" placeholder="Téléphone">
-            <button>Save</button>
+            <form action="" name="ajouterEmpl">
+                <div class="info-photo">
+                    <h3>New Employee</h3>
+                    <div id="photoURL">
+                        <img id="photoModal">
+                    </div>
+                </div>
+                <input type="text" placeholder="Nom complet" name="firstname">
+                <select name="" id="select">
+                    <option value="">Role</option>
+                    <option value="Techniciens">Techniciens IT</option>
+                    <option value="Agents">Agents de sécurité</option>
+                    <option value="Manager">Manager </option>
+                </select>
+
+                <input name="email" type="email" placeholder="Email">
+                <input type="text" placeholder="Téléphone">
+                <input id="file" accept="image/*" type="file">
+                <fieldset>Competence</fieldset>
+                <div id="dynamiqueForm"></div>
+                <div class="from-group">
+                    <button type="button" id="ajouteCompitence" class="btn-save">ajoute Competence</button>
+                </div>
+                <button class="btn-save">Save</button>
+            </form>
+
         </div>
     </div>
 
 
+    <script src="script/scritp.js"></script>
 </body>
 
 </html>
