@@ -1,24 +1,6 @@
 let dataEmployer = [];
 let add_btn = document.getElementById("btn-add");
-let modal = document.getElementById("modal");
 
-// === Nouveau: Modal de sélection d'employé pour une zone === //
-let selectedZone = null;
-const modalSelect = document.createElement("div");
-modalSelect.className = "modal-bg";
-modalSelect.id = "modalSelect";
-modalSelect.style.display = "none";
-
-modalSelect.innerHTML = `
-    <div class="modal" style="width:350px;">
-        <span id="closeSelect" style="cursor:pointer;float:right;font-size:20px;">&times;</span>
-        <h3>Choisir un employé</h3>
-        <div id="selectList"></div>
-    </div>
-`;
-document.body.appendChild(modalSelect);
-
-document.getElementById("closeSelect").onclick = () => modalSelect.style.display = "none";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -64,3 +46,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("addForm").addEventListener("submit", ajouterEmployer);
 });
+
+// === Rendu des cartes === //
+function renderDetails() {
+    const serviceLists = document.getElementById("listCard");
+    serviceLists.innerHTML = "";
+
+    dataEmployer.forEach((e, index) => {
+        const div = document.createElement("div");
+        div.classList.add("profil-card");
+        div.dataset.index = index;
+        div.dataset.assigned = "no"; // tracking
+
+        div.innerHTML = `
+            <div class="img-profil">
+                <img src="${e.photo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">
+            </div>
+            <div class="role">
+                <p>${e.firstname}</p>
+                <div class="role">${e.role}</div>
+            </div>
+            <button class="btn-remove">Remove</button>
+        `;
+        serviceLists.appendChild(div);
+    });
+
+    cardDetails();
+
+}
+
+// === function card details emlloyer === //
+function cardDetails() {
+    const cards = document.querySelectorAll(".profil-card");
+    const previewModal = document.getElementById("modalPreview");
+    const closeBtn = document.getElementById("closePreview");
+
+    cards.forEach(card => {
+        card.addEventListener("click", () => {
+            const index = card.dataset.index;
+            const emp = dataEmployer[index];
+            document.getElementById("previewPhoto").src = emp.photo;
+            document.getElementById("previewName").innerText = emp.firstname;
+            document.getElementById("previewRole").innerText = emp.role;
+            document.getElementById("previewEmail").innerText = emp.email;
+            document.getElementById("previewTele").innerText = emp.tele;
+            previewModal.style.display = "flex";
+        });
+    });
+
+    closeBtn.addEventListener("click", () => previewModal.style.display = "none");
+    previewModal.addEventListener("click", e => { 
+        if (e.target === previewModal) previewModal.style.display = "none"; 
+    });
+}
