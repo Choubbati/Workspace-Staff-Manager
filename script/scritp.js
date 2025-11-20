@@ -2,27 +2,21 @@ let dataEmployer = [];
 let add_btn = document.getElementById("btn-add");
 let modal = document.getElementById("modal");
 let selectedZone = null;
+let editingIndex = null; 
 
 // Définition des zones
-const allZones = [
-    "réception",
-    "salle des serveurs",
-    "salle de sécurité",
-    "salle du personnel",
-    "salle d'archives",
-    "salle de conférence"
-];
+const allZones = ["reception","serveurs","securite","personnel","archives","conference"];
+
 
 // Règles par rôle
 const roleZones = {
-    "réceptionniste": ["réception"],
-    "techniciens it": ["salle des serveurs"],
-    "agents de sécurité": ["salle de sécurité"],
-    "manager": [...allZones],
-    "nettoyage": allZones.filter(z => z !== "salle d'archives")
+    "réceptionniste": ["reception"],
+    "techniciens it": ["serveurs"],
+    "agents de sécurité": ["securite"],
+    "manager": ["reception","serveurs","securite","personnel","archives","conference"],
+    "nettoyage": ["reception","serveurs","securite","personnel","conference"], 
 };
-
-// Modal de sélection
+// Création du modal de sélection
 const modalSelect = document.createElement("div");
 modalSelect.className = "modal-bg";
 modalSelect.id = "modalSelect";
@@ -37,7 +31,7 @@ modalSelect.innerHTML = `
 document.body.appendChild(modalSelect);
 document.getElementById("closeSelect").onclick = () => modalSelect.style.display = "none";
 
-// DOM Loaded
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch("empl.json")
         .then(res => res.json())
@@ -53,10 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     add_btn.addEventListener('click', () => {
+        editingIndex = null; // mode ajout
         modal.style.display = 'flex';
         modal.addEventListener('click', e => {
             if (e.target === modal) modal.style.display = "none";
         });
+        document.getElementById("addForm").reset();
+        photoModal.src = "";
     });
 
     const containerExp = document.getElementById("experiencesContainer");
@@ -91,7 +88,7 @@ function renderDetails() {
 
         div.innerHTML = `
           <div class="img-profil">
-              <img src="${emp.photo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">
+              <img src="${emp.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
           </div>
           <div class="role">
               <p>${emp.firstname}</p>
@@ -107,7 +104,7 @@ function renderDetails() {
     cardDetails();
 }
 
-// Détails employé modal
+// détail employé modal
 function cardDetails() {
     const cards = document.querySelectorAll(".profil-card");
     const previewModal = document.getElementById("modalPreview");
@@ -115,7 +112,7 @@ function cardDetails() {
 
     cards.forEach(card => {
         card.addEventListener("click", (e) => {
-            if (e.target.classList.contains("btn-edit") || e.target.classList.contains("btn-remove")) return;
+            if(e.target.classList.contains("btn-edit") || e.target.classList.contains("btn-remove")) return;
             const index = card.dataset.index;
             const emp = dataEmployer[index];
             document.getElementById("previewPhoto").src = emp.photo;
@@ -131,9 +128,49 @@ function cardDetails() {
     previewModal.addEventListener("click", e => { if (e.target === previewModal) previewModal.style.display = "none"; });
 }
 
-// Edit / Remove buttons
+// Edit et Remove buttons
+function attachButtons() {
+    document.querySelectorAll(".profil-card").forEach(card => {
+        const btn = card.querySelector("button");
+        if(card.dataset.assigned === "no") {
+            btn.className = "btn-edit";
+            btn.innerText = "Edit";
+            btn.onclick = e => {
+                e.stopPropagation();
+                editingIndex = card.dataset.index;
+                const emp = dataEmployer[editingIndex];
 
+                document.getElementById("firstname").value = emp.firstname;
+                document.getElementById("role").value = emp.role;
+                document.getElementById("email").value = emp.email;
+                document.getElementById("tele").value = emp.tele;
+                document.getElementById("photoModal").src = emp.photo;
 
+                modal.style.display = "flex";
+            };
+        } else {
+            btn.className = "btn-remove";
+            btn.innerText = "Remove";
+            btn.onclick = e => {
+                e.stopPropagation();
+                card.dataset.assigned = "no";
+                document.getElementById("listCard").appendChild(card);
+                attachButtons();
+            };
+        }
+    });
+}
+
+// Préparation zones
+function prepareZoneButtons() {
+    const plusBtns = document.querySelectorAll(".add-worker-btn");
+    plusBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            selectedZone = btn.parentElement;
+            openSelectModal();
+        });
+    });
+}
 
 // Modal de sélection
 function openSelectModal() {
@@ -148,7 +185,7 @@ function openSelectModal() {
         return emp.allowedZones.map(z => z.toLowerCase()).includes(zoneName);
     });
 
-    if (available.length === 0) list.innerHTML = "<p style='padding:10px;text-align:center;'>Aucun employé autorisé pour cette zone.</p>";
+    if(available.length === 0) list.innerHTML = "<p style='padding:10px;text-align:center;'>Aucun employé autorisé pour cette zone.</p>";
 
     available.forEach(card => {
         const clone = card.cloneNode(true);
@@ -165,45 +202,43 @@ function openSelectModal() {
     modalSelect.style.display = "flex";
 }
 
-// Ajouter employé
+// Ajouter ou modifier employé
 function ajouterEmployer(e) {
     e.preventDefault();
-    const firstname = document.getElementById("firstname");
-    const role = document.getElementById("role");
-    const email = document.getElementById("email");
-    const tele = document.getElementById("tele");
-    const photoModal = document.getElementById("photoModal");
 
-    let valid = true;
+    const firstname = document.getElementById("firstname").value.trim();
+    const role = document.getElementById("role").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const tele = document.getElementById("tele").value.trim();
+    const photo = document.getElementById("photoModal").src;
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{6,15}$/;
 
-    [firstname, role, email, tele].forEach(input => input.style.border = "1px solid #ccc");
+    if(!firstname || !role || !emailRegex.test(email) || !phoneRegex.test(tele) || !photo) {
+        alert("Veuillez remplir correctement tous les champs et ajouter une photo.");
+        return;
+    }
 
-    if (firstname.value.trim() === "") { firstname.style.border = "2px solid red"; valid = false; }
-    if (role.value.trim() === "") { role.style.border = "2px solid red"; valid = false; }
-    if (!emailRegex.test(email.value.trim())) { email.style.border = "2px solid red"; valid = false; }
-    if (!phoneRegex.test(tele.value.trim())) { tele.style.border = "2px solid red"; valid = false; }
-    if (photoModal.src === "") { alert("attention ajouter une photo"); valid = false; }
+    const roleLower = role.toLowerCase();
+    const allowedZones = roleZones[roleLower] || allZones.filter(z => !["réception","salle des serveurs","salle de sécurité","salle d'archives"].includes(z));
 
-    if (!valid) return;
+    if(editingIndex !== null) {
+        const emp = dataEmployer[editingIndex];
+        emp.firstname = firstname;
+        emp.role = role;
+        emp.email = email;
+        emp.tele = tele;
+        emp.photo = photo;
+        emp.allowedZones = allowedZones;
+        editingIndex = null;
+    } else {
+        dataEmployer.push({ firstname, role, email, tele, photo, allowedZones });
+    }
 
-    const roleLower = role.value.trim().toLowerCase();
-    let allowedZones = roleZones[roleLower] || allZones.filter(z => !["réception", "salle des serveurs", "salle de sécurité", "salle d'archives"].includes(z));
-
-    const employer = {
-        firstname: firstname.value.trim(),
-        role: role.value.trim(),
-        email: email.value.trim(),
-        tele: tele.value.trim(),
-        photo: photoModal.src,
-        allowedZones: allowedZones
-    };
-
-    dataEmployer.push(employer);
     localStorage.setItem("employer", JSON.stringify(dataEmployer));
     renderDetails();
     document.getElementById("addForm").reset();
-    photoModal.src = "";
+    document.getElementById("photoModal").src = "";
     modal.style.display = "none";
 }
