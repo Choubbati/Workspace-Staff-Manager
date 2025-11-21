@@ -4,6 +4,8 @@ let modal = document.getElementById("modal");
 let selectedZone = null;
 let editingIndex = null;
 
+
+
 // Définition des zones
 const allZones = ["reception", "serveurs", "securite", "personnel", "archives", "conference"];
 
@@ -51,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("file");
     const photoModal = document.getElementById("photoModal");
     input.addEventListener("change", () => {
-        if(input.files[0]) photoModal.src = URL.createObjectURL(input.files[0]);
+        if (input.files[0]) photoModal.src = URL.createObjectURL(input.files[0]);
     });
 
     // Add employee button
@@ -69,8 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const div = document.createElement("div");
         div.classList.add("experience");
         div.innerHTML = `
-          <input type="text" name="poste[]" placeholder="Poste">
-          <input type="text" name="duree[]" placeholder="Durée">
+          <input type="text" id="post" name="poste[]" placeholder="Poste">
+          <input type="text" id="duree" name="duree[]" placeholder="Durée">
           <button type="button" class="removeExperience">Supprimer</button>
         `;
         containerExp.appendChild(div);
@@ -92,11 +94,13 @@ function ajouterEmployer(e) {
     const emailEl = document.getElementById("email");
     const teleEl = document.getElementById("tele");
     const photoEl = document.getElementById("photoModal");
+    const poste = document.getElementById("post")
+   
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{6,15}$/;
 
-    [firstnameEl, roleEl, emailEl, teleEl].forEach(input => {
+    [firstnameEl, roleEl, emailEl, teleEl ].forEach(input => {
         input.style.border = "1px solid #ccc";
     });
 
@@ -114,6 +118,7 @@ function ajouterEmployer(e) {
     const email = emailEl.value.trim();
     const tele = teleEl.value.trim();
     const photo = photoEl.src;
+    const post = poste.value.trim()
 
     const roleLower = role.toLowerCase();
     const allowedZones = roleZones[roleLower] || [];
@@ -128,13 +133,14 @@ function ajouterEmployer(e) {
         emp.tele = tele;
         emp.photo = photo;
         emp.allowedZones = allowedZones;
+        emp.poste = poste
         editingIndex = null;
     } else {
         //ajouter un empl
-        dataEmployer.push({ firstname, role, email, tele, photo, allowedZones });
+        dataEmployer.push({ firstname, role, email, tele, photo,post, allowedZones });
     }
 
-//save liste dans localstorage
+    //save liste dans localstorage
     localStorage.setItem("employer", JSON.stringify(dataEmployer));
 
     renderDetails();
@@ -156,7 +162,7 @@ function renderDetails() {
         div.dataset.assigned = "no";
         div.innerHTML = `
           <div class="img-profil">
-              <img src="${emp.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
+              <img id="imgpro" src="${emp.photo}"">
           </div>
           <div class="role">
               <p>${emp.firstname}</p>
@@ -219,6 +225,7 @@ function cardDetails() {
             document.getElementById("previewRole").innerText = emp.role;
             document.getElementById("previewEmail").innerText = emp.email;
             document.getElementById("previewTele").innerText = emp.tele;
+            document.getElementById("previewPost").innerText = emp.post
             previewModal.style.display = "flex";
         });
     });
@@ -228,9 +235,9 @@ function cardDetails() {
 }
 function prepareZoneButtons() {
     const plusBtns = document.querySelectorAll(".add-worker-btn");
-    
+
     plusBtns.forEach(btn => {
-        btn.style.display = "inline-block"; 
+        btn.style.display = "inline-block";
         btn.onclick = () => {
             selectedZone = btn.closest("[data-zone]");
             if (!selectedZone) {
@@ -240,4 +247,47 @@ function prepareZoneButtons() {
             openSelectModal();
         };
     });
+}
+
+function openSelectModal() {
+    const list = document.getElementById("selectList");
+    list.innerHTML = "";
+
+    const zoneName = selectedZone.dataset.zone.toLowerCase();
+    const unassigned = [...document.querySelectorAll(".profil-card[data-assigned='no']")];
+
+
+    const available = unassigned.filter(card => {
+        const emp = dataEmployer[card.dataset.index];
+        return emp.allowedZones.map(z => z.toLowerCase()).includes(zoneName);
+    });
+
+    if (available.length === 0) {
+        list.innerHTML = "<p style='padding:10px;text-align:center;'>Aucun employé autorisé pour cette zone.</p>";
+        return;
+    }
+
+    available.forEach(card => {
+        const clone = card.cloneNode(true);
+        clone.style.cursor = "pointer";
+
+        clone.addEventListener("click", () => {
+            const currentCount = selectedZone.querySelectorAll(".profil-card").length;
+            const max = zoneLimits[zoneName] ?? Infinity;
+
+            if (currentCount >= max) {
+                alert("Cette zone a atteint le nombre maximal d'employés autorisé.");
+                return;
+            }
+
+            card.dataset.assigned = "yes";
+            selectedZone.appendChild(card);
+            attachButtons();
+            modalSelect.style.display = "none";
+        });
+
+        list.appendChild(clone);
+    });
+
+    modalSelect.style.display = "flex";
 }
