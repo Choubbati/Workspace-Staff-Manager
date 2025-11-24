@@ -211,7 +211,7 @@ input {
     padding: 10px;
     width: 300px;
     height: 250px;
-    background-image: url(/assets/6.png);
+    background-image: url(/6.png);
     background-size: cover;
 }
 
@@ -222,7 +222,7 @@ input {
 
     width: 300px;
     height: 250px;
-    background-image: url(/assets/5.png);
+    background-image: url(/5.png);
     background-size: cover;
 }
 
@@ -232,7 +232,7 @@ input {
     align-items: center;
     width: 300px;
     height: 250px;
-    background-image: url(/assets/4.png);
+    background-image: url(/4.png);
     background-size: cover;
 }
 
@@ -242,7 +242,7 @@ input {
     align-items: center;
     width: 300px;
     height: 250px;
-    background-image: url(/assets/3.png);
+    background-image: url(/3.png);
     background-size: cover;
 }
 
@@ -252,14 +252,14 @@ input {
     align-items: center;
     width: 300px;
     height: 250px;
-    background-image: url(/assets/2.png);
+    background-image: url(/2.png);
     background-size: cover;
 }
 
 .zone {
     width: 300px;
     height: 250px;
-    background-image: url(/assets/1.png);
+    background-image: url(/1.png);
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -313,7 +313,6 @@ span {
 }
 
 
-/* Style dropdown select dynamically added */
 .zone select {
     padding: 5px 10px;
     border-radius: 6px;
@@ -334,7 +333,6 @@ span {
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
 }
 
-/* Style button assign */
 .assign-btn {
     padding: 5px 10px;
     border: none;
@@ -406,4 +404,127 @@ span {
     border-radius:50%;
     object-fit:cover;
 
+}
+
+
+@media (max-width: 992px) {
+
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .staff-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .main {
+        width: 100%;
+    }
+
+    .zones {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Sidebar */
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .profil-card {
+        width: 90%;
+    }
+
+    .add-btn {
+        width: 90%;
+        font-size: 14px;
+    }
+
+    /* // Zones  */
+    .zones {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .zone,
+    .zone1,
+    .zone2,
+    .zone3,
+    .zone4,
+    .zone5 {
+        width: 90%;
+        height: 220px;
+    }
+
+    .zone h3,
+    .zone1 h3,
+    .zone2 h3,
+    .zone3 h3,
+    .zone4 h3,
+    .zone5 h3 {
+        font-size: 18px;
+        padding-top: 10px;
+    }
+
+    .add-worker-btn {
+        width: 60px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+
+    .modal {
+        width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .profil-card {
+        flex-direction: column;
+        gap: 5px;
+        width: 95%;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .staff-list {
+        padding: 10px;
+    }
+
+    .zone,
+    .zone1,
+    .zone2,
+    .zone3,
+    .zone4,
+    .zone5 {
+        width: 95%;
+        height: 200px;
+    }
+
+    .modal {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .modal input,
+    .modal select {
+        font-size: 14px;
+    }
+
+    .btn-save,
+    #addExperienceBtn {
+        font-size: 14px;
+        padding: 8px;
+    }
 }
